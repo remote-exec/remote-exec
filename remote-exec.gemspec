@@ -1,17 +1,17 @@
 lib = File.expand_path('../lib/', __FILE__)
 $:.unshift lib unless $:.include?(lib)
 
-require 'rvm2/remote/version'
+require 'remote/exec/version'
 
 Gem::Specification.new do |spec|
-  spec.name        = 'rvm2-remote'
-  spec.version     = ::Rvm2::Remote::VERSION
-  spec.license     = 'Apache2'
+  spec.name        = 'remote-exec'
+  spec.version     = ::Remote::Exec::VERSION
+  spec.licenses    = ['MIT']
 
   spec.authors     = ['Michal Papis']
   spec.email       = ['mpapis@gmail.com']
 
-  spec.homepage    = 'https://github.com/rvm/rvm2-remote'
+  spec.homepage    = 'https://github.com/remote-exec/remote-exec'
   spec.summary     =
   spec.description = 'Invoke commands on remote hosts'
 

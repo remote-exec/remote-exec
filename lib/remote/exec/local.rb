@@ -1,6 +1,6 @@
 require 'session'
 
-class Rvm2::Shell::Runner::Local
+class Remote::Exec::Local
   attr_reader :shell, :last_status
 
   def initialize(shell = "sh")

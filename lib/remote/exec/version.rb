@@ -1,5 +1,5 @@
-module Rvm2
-  class Remote
+module Remote
+  class Exec
     VERSION = '0.0.1'
   end
 end

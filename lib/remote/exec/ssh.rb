@@ -1,6 +1,6 @@
 require 'net/ssh'
 
-class Rvm2::Shell::Runner::Ssh
+class Remote::Exec::Ssh
   attr_reader :host, :user, :last_status
 
   def initialize(host, user = nil)

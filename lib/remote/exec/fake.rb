@@ -1,4 +1,4 @@
-class Rvm2::Shell::Runner::Fake
+class Remote::Exec::Fake
   attr_reader :last_status
 
   def execute(command)
