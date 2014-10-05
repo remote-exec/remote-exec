@@ -2,10 +2,12 @@ require 'net/ssh'
 
 class Remote::Exec::Ssh
   attr_reader :host, :user, :last_status
+  attr_accessor :options
 
-  def initialize(host, user = nil)
+  def initialize(host, user = nil, options)
     @host = host
     @user = user
+    @options = options
   end
 
   # TODO: make it run in one session
@@ -31,6 +33,6 @@ class Remote::Exec::Ssh
   end
 
   def ssh
-    @ssh ||= Net::SSH.start(host, user)
+    @ssh ||= Net::SSH.start(host, user, options)
   end
 end
