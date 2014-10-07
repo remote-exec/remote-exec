@@ -1,4 +1,5 @@
 require 'net/ssh'
+require 'ruby/hooks'
 
 class Remote::Exec::Ssh
   attr_reader :host, :user, :last_status
