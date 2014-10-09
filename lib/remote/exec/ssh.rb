@@ -5,7 +5,7 @@ class Remote::Exec::Ssh
   attr_reader :host, :user, :last_status
   attr_accessor :options
 
-  def initialize(host, user = nil, options)
+  def initialize(host, user, options = {})
     @host = host
     @user = user
     @options = options
