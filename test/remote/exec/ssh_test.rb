@@ -2,15 +2,6 @@ require 'test_helper'
 require 'remote/exec/ssh'
 require 'etc'
 
-enable_ssh_test =
-begin
-  Net::SSH.start("localhost", Etc.getlogin).close
-  true
-rescue Exception => e
-  puts "Disabling SSH runner test because: #{e}"
-  false
-end
-
 class Remote::Exec::TestSsh < MiniTest::Unit::TestCase
   def setup
     @test = Remote::Exec::Ssh
@@ -53,4 +44,4 @@ class Remote::Exec::TestSsh < MiniTest::Unit::TestCase
     assert_equal 1, called
     assert_equal 0, status
   end
-end if enable_ssh_test
+end
