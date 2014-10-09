@@ -18,10 +18,10 @@ class Remote::Exec::Ssh
       channel.request_pty
       channel.exec command do |ch, success|
         channel.on_data do |ch, data|
-          yield(data, nil)
+          yield(data, nil) if block_given?
         end
         channel.on_extended_data do |ch, type, data|
-          yield(nil, data)
+          yield(nil, data) if block_given?
         end
         channel.on_request("exit-status") do |ch, data|
           @last_status = data.read_long

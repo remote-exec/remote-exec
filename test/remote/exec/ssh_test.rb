@@ -48,14 +48,7 @@ describe Remote::Exec::Ssh do
     end
 
     assert_scripted do
-      test_command = "true"
-      called = 0
-      status =
-      subject.execute(test_command) do |out, err|
-        called+=1
-      end
-      assert_equal 0, called
-      assert_equal 0, status
+      subject.execute("true").must_equal 0
     end
   end
 
@@ -70,14 +63,7 @@ describe Remote::Exec::Ssh do
     end
 
     assert_scripted do
-      test_command = "false"
-      called = 0
-      status =
-      subject.execute(test_command) do |out, err|
-        called+=1
-      end
-      assert_equal 0, called
-      assert_equal 1, status
+      subject.execute("false").must_equal 1
     end
   end
 
@@ -86,23 +72,18 @@ describe Remote::Exec::Ssh do
       channel = session.opens_channel
       channel.sends_request_pty
       channel.sends_exec "echo test me"
-      channel.gets_data("test me")
+      channel.gets_data("test me\n")
       channel.gets_exit_status(0)
       channel.gets_close
       channel.sends_close
     end
 
     assert_scripted do
-      test_command = "echo test me"
-      called = 0
-      status =
-      subject.execute(test_command) do |out, err|
-        assert_equal out.strip, "test me"
-        assert_equal err, nil
-        called+=1
-      end
-      assert_equal 1, called
-      assert_equal 0, status
+      subject.execute("echo test me") do |out, err|
+        out.must_equal "test me\n"
+        err.must_be_nil
+      end.must_equal 0
     end
   end
+
 end
