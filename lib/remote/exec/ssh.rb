@@ -1,3 +1,12 @@
+=begin
+Copyright 2014 Michal Papis <mpapis@gmail.com>
+
+See the file LICENSE for copying permission.
+
+Partially based on test-kitchen by Fletcher Nichol <fnichol@nichol.ca>
+License: https://github.com/test-kitchen/test-kitchen/blob/459238b88c/LICENSE
+=end
+
 require 'net/ssh'
 require 'ruby/hooks'
 
@@ -9,6 +18,17 @@ class Remote::Exec::Ssh
     @host = host
     @user = user
     @options = options
+    if block_given?
+      yield self
+      shutdown
+    end
+  end
+
+  def shutdown
+    return if @ssh.nil?
+    ssh.shutdown!
+  ensure
+    @ssh = nil
   end
 
   # TODO: make it run in one session
