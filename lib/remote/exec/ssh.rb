@@ -15,15 +15,6 @@ class Remote::Exec::Ssh < Remote::Exec::Base
   attr_reader :host, :user
   attr_accessor :options
 
-  define_hook :before_connect
-  define_hook :on_connect_retry
-  define_hook :on_connect_fail
-  define_hook :after_connect
-  define_hook :before_shutdown
-  define_hook :before_execute
-  define_hook :on_execute_data
-  define_hook :after_execute
-
   def initialize(host, user, options = {})
     @host = host
     @user = user
