@@ -15,6 +15,9 @@ class Remote::Exec::Ssh
   attr_reader :host, :user
   attr_accessor :options
 
+  define_hook :before_connect
+  define_hook :on_connect_retry
+  define_hook :on_connect_fail
   define_hook :after_connect
   define_hook :before_shutdown
   define_hook :before_execute
@@ -79,8 +82,41 @@ class Remote::Exec::Ssh
   end
 
   def ssh
-    @ssh ||= Net::SSH.start(host, user, options).tap do |ssh|
-      after_connect.changed_and_notify(self, ssh)
-    end
+    @ssh ||= establish_connection
   end
+
+  # Establish a connection session to the remote host.
+  #
+  # @return [Net::SSH::Connection::Session] the SSH connection session
+  # @api private
+  def establish_connection
+    rescue_exceptions = [
+      Errno::EACCES,
+      Errno::EADDRINUSE,
+      Errno::ECONNREFUSED,
+      Errno::ECONNRESET,
+      Errno::ENETUNREACH,
+      Errno::EHOSTUNREACH,
+      Net::SSH::Disconnect,
+    ]
+    retries = options[:ssh_retries] || 3
+
+    begin
+      before_connect.changed_and_notify(self)
+      ssh = Net::SSH.start(hostname, username, options)
+    rescue *rescue_exceptions => e
+      retries -= 1
+      if retries > 0
+        on_connect_retry.changed_and_notify(self, e)
+        sleep options[:ssh_timeout] || 1
+        retry
+      else
+        on_connect_fail.changed_and_notify(self, e)
+        raise e
+      end
+    end
+    after_connect.changed_and_notify(self, ssh)
+    ssh
+  end
+
 end
