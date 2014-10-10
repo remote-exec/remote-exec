@@ -2,7 +2,7 @@ require 'net/ssh'
 require 'ruby/hooks'
 
 class Remote::Exec::Ssh
-  attr_reader :host, :user, :last_status
+  attr_reader :host, :user
   attr_accessor :options
 
   def initialize(host, user, options = {})
@@ -13,7 +13,7 @@ class Remote::Exec::Ssh
 
   # TODO: make it run in one session
   def execute(command)
-    @last_status = nil
+    last_status = nil
     ssh.open_channel do |channel|
       channel.request_pty
       channel.exec command do |ch, success|
@@ -24,13 +24,13 @@ class Remote::Exec::Ssh
           yield(nil, data) if block_given?
         end
         channel.on_request("exit-status") do |ch, data|
-          @last_status = data.read_long
+          last_status = data.read_long
         end
       end
       channel.wait
     end
     ssh.loop
-    @last_status
+    last_status
   end
 
   def ssh
