@@ -10,8 +10,7 @@ License: https://github.com/test-kitchen/test-kitchen/blob/459238b88c/LICENSE
 require 'net/ssh'
 require 'ruby/hooks'
 
-class Remote::Exec::Ssh
-  extend Ruby::Hooks::InstanceHooks
+class Remote::Exec::Ssh < Remote::Exec::Base
   attr_reader :host, :user
   attr_accessor :options
 
