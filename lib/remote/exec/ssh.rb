@@ -11,6 +11,7 @@ require 'net/ssh'
 require 'ruby/hooks'
 
 class Remote::Exec::Ssh
+  extend Ruby::Hooks::InstanceHooks
   attr_reader :host, :user
   attr_accessor :options
 
