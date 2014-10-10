@@ -12,12 +12,12 @@ require 'ruby/hooks'
 require "remote/exec/base"
 
 class Remote::Exec::Ssh < Remote::Exec::Base
-  attr_reader :host, :user
+  attr_reader :hostname, :username
   attr_accessor :options
 
-  def initialize(host, user, options = {})
-    @host = host
-    @user = user
+  def initialize(hostname, username, options = {})
+    @hostname = hostname
+    @username = username
     @options = options
     if block_given?
       yield self

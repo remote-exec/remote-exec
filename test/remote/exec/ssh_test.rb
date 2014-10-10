@@ -44,16 +44,17 @@ describe Remote::Exec::Ssh do
 
   subject do
     Remote::Exec::Ssh.allocate.tap do |ssh|
-      subject.instance_variable_set(:@ssh, connection)
-      subject.instance_variable_set(:@options, {})
+      ssh.instance_variable_set(:@ssh, connection)
+      ssh.instance_variable_set(:@options, {})
     end
   end
 
   describe "#initialize" do
+
     it "sets default variables" do
       subject.send(:initialize, 1, 2, 3)
-      subject.host.must_equal 1
-      subject.user.must_equal 2
+      subject.hostname.must_equal 1
+      subject.username.must_equal 2
       subject.options.must_equal 3
     end
 
@@ -62,9 +63,11 @@ describe Remote::Exec::Ssh do
       subject.send(:initialize, 1, 2, 3) { calls+=1 }
       calls.must_equal 1
     end
+
   end #initialize
 
   describe "#execute" do
+
     it "executes true" do
       story do |session|
         channel = session.opens_channel
@@ -135,6 +138,14 @@ describe Remote::Exec::Ssh do
 
   end #execute
 
+  describe "#establish_connection" do
+    it "does connection" do
+      Net::SSH.unstub(:start)
+      Net::SSH.stubs(:start).returns(connection)
+      subject.establish_connection.must_equal(connection)
+    end
+  end
+
   describe "establishing a connection" do
 
     [
@@ -145,24 +156,26 @@ describe Remote::Exec::Ssh do
       describe "raising #{klass}" do
 
         before do
+          Net::SSH.unstub(:start)
           Net::SSH.stubs(:start).raises(klass)
+          subject.instance_variable_set(:@ssh, nil)
           subject.options[:ssh_retries] = 3
           subject.stubs(:sleep)
         end
 
         it "reraises the #{klass} exception" do
-          proc { subject.exec("nope") }.must_raise klass
+          proc { subject.execute("nope") }.must_raise klass
         end
 
         it "attempts to connect ':ssh_retries' times" do
           begin
-            subject.exec("nope")
-          rescue # rubocop:disable Lint/HandleExceptions
+            subject.establish_connection
+          rescue
           end
 
-          logged_output.string.lines.select { |l|
-            l =~ debug_line("[SSH] opening connection to me@foo:22<{:ssh_retries=>3}>")
-          }.size.must_equal subject.options[:ssh_retries]
+#          logged_output.string.lines.select { |l|
+#            l =~ debug_line("[SSH] opening connection to me@foo:22<{:ssh_retries=>3}>")
+#          }.size.must_equal subject.options[:ssh_retries]
         end
 
         it "sleeps for 1 second between retries" do
@@ -170,34 +183,35 @@ describe Remote::Exec::Ssh do
           subject.expects(:sleep).with(1).twice
 
           begin
-            subject.exec("nope")
-          rescue # rubocop:disable Lint/HandleExceptions
+            subject.establish_connection
+          rescue
           end
         end
 
         it "logs the first 2 retry failures on info" do
           begin
-            subject.exec("nope")
-          rescue # rubocop:disable Lint/HandleExceptions
+            subject.establish_connection
+          rescue
           end
 
-          logged_output.string.lines.select { |l|
-            l =~ info_line_with("[SSH] connection failed, retrying ")
-          }.size.must_equal 2
+#          logged_output.string.lines.select { |l|
+#            l =~ info_line_with("[SSH] connection failed, retrying ")
+#          }.size.must_equal 2
         end
 
         it "logs the last retry failures on warn" do
           begin
-            subject.exec("nope")
-          rescue # rubocop:disable Lint/HandleExceptions
+            subject.establish_connection
+          rescue
           end
 
-          #~ logged_output.string.lines.select { |l|
-            #~ l =~ warn_line_with("[SSH] connection failed, terminating ")
-          #~ }.size.must_equal 1
+#          logged_output.string.lines.select { |l|
+#            l =~ warn_line_with("[SSH] connection failed, terminating ")
+#          }.size.must_equal 1
         end
       end
     end
+
   end #"establishing a connection"
 
 end

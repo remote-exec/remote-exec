@@ -1,4 +1,5 @@
 require 'session'
+require "remote/exec/version"
 
 class Remote::Exec::Local
   attr_reader :shell, :last_status

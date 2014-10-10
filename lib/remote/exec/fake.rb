@@ -1,3 +1,5 @@
+require "remote/exec/version"
+
 class Remote::Exec::Fake
   attr_reader :last_status
 

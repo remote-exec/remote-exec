@@ -5,6 +5,7 @@ See the file LICENSE for copying permission.
 =end
 
 require "rubygems"
+gem "minitest"
 
 if
   RUBY_VERSION == "2.0.0" && # check Gemfile
