@@ -20,6 +20,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency('net-ssh')
   spec.add_development_dependency('rake')
   spec.add_development_dependency("minitest")
+  spec.add_development_dependency("mocha")
 
   spec.files        = Dir.glob('lib/**/*.rb')
   spec.test_files   = Dir.glob('test/**/*.rb')

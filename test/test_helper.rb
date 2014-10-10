@@ -30,3 +30,4 @@ Dir[File.expand_path("../../lib/**/*.rb", __FILE__)].each{|f| require f }
 
 require "minitest/autorun" unless $0=="-e" # skip in guard
 require "minitest/unit"
+require "mocha/setup"

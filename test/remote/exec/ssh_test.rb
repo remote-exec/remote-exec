@@ -43,7 +43,10 @@ describe Remote::Exec::Ssh do
   include Net::SSH::Test
 
   subject do
-    Remote::Exec::Ssh.allocate.tap{|ssh| ssh.instance_variable_set(:@ssh, connection)}
+    Remote::Exec::Ssh.allocate.tap do |ssh|
+      subject.instance_variable_set(:@ssh, connection)
+      subject.instance_variable_set(:@options, {})
+    end
   end
 
   describe "#initialize" do
@@ -131,5 +134,70 @@ describe Remote::Exec::Ssh do
     end
 
   end #execute
+
+  describe "establishing a connection" do
+
+    [
+      Errno::EACCES, Errno::EADDRINUSE, Errno::ECONNREFUSED,
+      Errno::ECONNRESET, Errno::ENETUNREACH, Errno::EHOSTUNREACH,
+      Net::SSH::Disconnect
+    ].each do |klass|
+      describe "raising #{klass}" do
+
+        before do
+          Net::SSH.stubs(:start).raises(klass)
+          subject.options[:ssh_retries] = 3
+          subject.stubs(:sleep)
+        end
+
+        it "reraises the #{klass} exception" do
+          proc { subject.exec("nope") }.must_raise klass
+        end
+
+        it "attempts to connect ':ssh_retries' times" do
+          begin
+            subject.exec("nope")
+          rescue # rubocop:disable Lint/HandleExceptions
+          end
+
+          logged_output.string.lines.select { |l|
+            l =~ debug_line("[SSH] opening connection to me@foo:22<{:ssh_retries=>3}>")
+          }.size.must_equal subject.options[:ssh_retries]
+        end
+
+        it "sleeps for 1 second between retries" do
+          subject.unstub(:sleep)
+          subject.expects(:sleep).with(1).twice
+
+          begin
+            subject.exec("nope")
+          rescue # rubocop:disable Lint/HandleExceptions
+          end
+        end
+
+        it "logs the first 2 retry failures on info" do
+          begin
+            subject.exec("nope")
+          rescue # rubocop:disable Lint/HandleExceptions
+          end
+
+          logged_output.string.lines.select { |l|
+            l =~ info_line_with("[SSH] connection failed, retrying ")
+          }.size.must_equal 2
+        end
+
+        it "logs the last retry failures on warn" do
+          begin
+            subject.exec("nope")
+          rescue # rubocop:disable Lint/HandleExceptions
+          end
+
+          #~ logged_output.string.lines.select { |l|
+            #~ l =~ warn_line_with("[SSH] connection failed, terminating ")
+          #~ }.size.must_equal 1
+        end
+      end
+    end
+  end #"establishing a connection"
 
 end
