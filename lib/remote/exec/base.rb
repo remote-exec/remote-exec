@@ -5,7 +5,7 @@ See the file LICENSE for copying permission.
 =end
 
 require 'ruby/hooks'
-require "remote/exec/base"
+require "remote/exec/version"
 
 class Remote::Exec::Base
   extend Ruby::Hooks::InstanceHooks
