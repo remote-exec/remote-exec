@@ -42,9 +42,9 @@ end
 class ErrorCounter
   attr_reader :errors
   def on_error(method, *args)
-    errors ||= {}
-    errors[method] ||= 0
-    errors[method] += 1
+    @errors ||= {}
+    @errors[method] ||= 0
+    @errors[method] += 1
   end
   def on_connect_retry(*args)
     on_error(:on_connect_retry, *args)
@@ -182,7 +182,8 @@ describe Remote::Exec::Ssh do
         end
 
         it "reraises the #{klass} exception" do
-          proc { subject.execute("nope") }.must_raise klass
+          proc { subject.establish_connection }.must_raise klass
+          @error_counter.errors.must_equal({:on_connect_retry=>2, :on_connect_fail=>1})
         end
 
         it "attempts to connect ':ssh_retries' times" do
@@ -190,11 +191,7 @@ describe Remote::Exec::Ssh do
             subject.establish_connection
           rescue
           end
-          @error_counter.errors.must_equal(nil)
-
-#          logged_output.string.lines.select { |l|
-#            l =~ debug_line("[SSH] opening connection to me@foo:22<{:ssh_retries=>3}>")
-#          }.size.must_equal subject.options[:ssh_retries]
+          @error_counter.errors.must_equal({:on_connect_retry=>2, :on_connect_fail=>1})
         end
 
         it "sleeps for 1 second between retries" do
@@ -205,6 +202,7 @@ describe Remote::Exec::Ssh do
             subject.establish_connection
           rescue
           end
+          @error_counter.errors.must_equal({:on_connect_retry=>2, :on_connect_fail=>1})
         end
 
         it "logs the first 2 retry failures on info" do
@@ -212,11 +210,7 @@ describe Remote::Exec::Ssh do
             subject.establish_connection
           rescue
           end
-          @error_counter.errors.must_equal(nil)
-
-#          logged_output.string.lines.select { |l|
-#            l =~ info_line_with("[SSH] connection failed, retrying ")
-#          }.size.must_equal 2
+          @error_counter.errors.must_equal({:on_connect_retry=>2, :on_connect_fail=>1})
         end
 
         it "logs the last retry failures on warn" do
@@ -224,11 +218,8 @@ describe Remote::Exec::Ssh do
             subject.establish_connection
           rescue
           end
-          @error_counter.errors.must_equal(nil)
+          @error_counter.errors.must_equal({:on_connect_retry=>2, :on_connect_fail=>1})
 
-#          logged_output.string.lines.select { |l|
-#            l =~ warn_line_with("[SSH] connection failed, terminating ")
-#          }.size.must_equal 1
         end
       end
     end
