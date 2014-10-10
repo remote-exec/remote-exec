@@ -39,6 +39,21 @@ module Net
   end
 end
 
+class ErrorCounter
+  attr_reader :errors
+  def on_error(method, *args)
+    errors ||= {}
+    errors[method] ||= 0
+    errors[method] += 1
+  end
+  def on_connect_retry(*args)
+    on_error(:on_connect_retry, *args)
+  end
+  def on_connect_fail(*args)
+    on_error(:on_connect_fail, *args)
+  end
+end
+
 describe Remote::Exec::Ssh do
   include Net::SSH::Test
 
@@ -156,9 +171,12 @@ describe Remote::Exec::Ssh do
       describe "raising #{klass}" do
 
         before do
+          @error_counter = ErrorCounter.new
           Net::SSH.unstub(:start)
           Net::SSH.stubs(:start).raises(klass)
           subject.instance_variable_set(:@ssh, nil)
+          subject.on_connect_retry.add_observer(@error_counter, :on_connect_retry)
+          subject.on_connect_fail.add_observer(@error_counter, :on_connect_fail)
           subject.options[:ssh_retries] = 3
           subject.stubs(:sleep)
         end
@@ -172,6 +190,7 @@ describe Remote::Exec::Ssh do
             subject.establish_connection
           rescue
           end
+          @error_counter.errors.must_equal(nil)
 
 #          logged_output.string.lines.select { |l|
 #            l =~ debug_line("[SSH] opening connection to me@foo:22<{:ssh_retries=>3}>")
@@ -193,6 +212,7 @@ describe Remote::Exec::Ssh do
             subject.establish_connection
           rescue
           end
+          @error_counter.errors.must_equal(nil)
 
 #          logged_output.string.lines.select { |l|
 #            l =~ info_line_with("[SSH] connection failed, retrying ")
@@ -204,6 +224,7 @@ describe Remote::Exec::Ssh do
             subject.establish_connection
           rescue
           end
+          @error_counter.errors.must_equal(nil)
 
 #          logged_output.string.lines.select { |l|
 #            l =~ warn_line_with("[SSH] connection failed, terminating ")
