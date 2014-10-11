@@ -1,46 +1,43 @@
 require 'test_helper'
 require 'remote/exec/local'
 
-class Remote::Exec::TestLocal < MiniTest::Unit::TestCase
-  def setup
-    @test = Remote::Exec::Local
+describe Remote::Exec::Local do
+  subject do
+    Remote::Exec::Local.new
   end
 
-  def test_true
+  it "runs true" do
     test_command = "true"
-    local = @test.new
     called = 0
     status =
-    local.execute(test_command) do |out, err|
+    subject.execute(test_command) do |out, err|
       called+=1
     end
-    assert_equal 0, called
-    assert_equal 0, status
+    called.must_equal(0)
+    status.must_equal(0)
   end
 
-  def test_false
+  it "runs false" do
     test_command = "false"
-    local = @test.new
     called = 0
     status =
-    local.execute(test_command) do |out, err|
+    subject.execute(test_command) do |out, err|
       called+=1
     end
-    assert_equal 0, called
-    assert_equal 1, status
+    called.must_equal(0)
+    status.must_equal(1)
   end
 
-  def test_echo_test
+  it "runs echo test" do
     test_command = "echo test"
-    local = @test.new
     called = 0
     status =
-    local.execute(test_command) do |out, err|
+    subject.execute(test_command) do |out, err|
       assert_equal out.strip, "test"
       assert_equal err, nil
       called+=1
     end
-    assert_equal 1, called
-    assert_equal 0, status
+    called.must_equal(1)
+    status.must_equal(0)
   end
 end
