@@ -115,9 +115,9 @@ class Remote::Exec::Ssh < Remote::Exec::Base
 
   def handle_exception_retry(exception)
     if @retries > 0
-      @retries -= 1
       on_connect_retry.changed_and_notify(self, exception, @retries)
       sleep options[:ssh_timeout] || 1
+      @retries -= 1
     else
       on_connect_fail.changed_and_notify(self, exception)
       # TODO: should we wrap the error in some other common class?
