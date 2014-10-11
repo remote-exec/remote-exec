@@ -20,8 +20,11 @@ class Remote::Exec::Ssh < Remote::Exec::Base
     @username = username
     @options = options
     if block_given?
-      yield self
-      shutdown
+      begin
+        yield self
+      ensure
+        shutdown
+      end
     end
   end
 
@@ -78,26 +81,26 @@ class Remote::Exec::Ssh < Remote::Exec::Base
     @ssh ||= establish_connection
   end
 
+  RESCUE_EXCEPTIONS = [
+    Errno::EACCES,
+    Errno::EADDRINUSE,
+    Errno::ECONNREFUSED,
+    Errno::ECONNRESET,
+    Errno::ENETUNREACH,
+    Errno::EHOSTUNREACH,
+    Net::SSH::Disconnect,
+  ]
+
   # Establish a connection session to the remote host.
   #
   # @return [Net::SSH::Connection::Session] the SSH connection session
   # @api private
   def establish_connection
-    rescue_exceptions = [
-      Errno::EACCES,
-      Errno::EADDRINUSE,
-      Errno::ECONNREFUSED,
-      Errno::ECONNRESET,
-      Errno::ENETUNREACH,
-      Errno::EHOSTUNREACH,
-      Net::SSH::Disconnect,
-    ]
     retries = options[:ssh_retries] || 3
-
     begin
       before_connect.changed_and_notify(self)
       ssh = Net::SSH.start(hostname, username, options)
-    rescue *rescue_exceptions => e
+    rescue *RESCUE_EXCEPTIONS => e
       retries -= 1
       if retries > 0
         on_connect_retry.changed_and_notify(self, e)
