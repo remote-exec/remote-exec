@@ -54,7 +54,7 @@ class ErrorCounter
   end
 end
 
-class ExecutaDataHook < Struct.new(:object, :channel, :stdout, :stderr)
+class ExecutaDataHook < Struct.new(:object, :stdout, :stderr)
   attr_reader :results
   def initialize(*args)
     @results = []
@@ -142,11 +142,7 @@ describe Remote::Exec::Ssh do
           out.must_equal "test me\n"
           err.must_be_nil
         end.must_equal 0
-        hook.results.size.must_equal(1)
-        hook.results[0].object.must_equal(subject)
-        hook.results[0].channel.must_be_kind_of(Net::SSH::Connection::Channel)
-        hook.results[0].stdout.must_equal("test me\n")
-        hook.results[0].stderr.must_be_nil
+        hook.results.must_equal([ExecutaDataHook.new(subject, "test me\n", nil)])
       end
     end
 
@@ -167,11 +163,7 @@ describe Remote::Exec::Ssh do
           out.must_be_nil
           err.must_equal "test me\n"
         end.must_equal 0
-        hook.results.size.must_equal(1)
-        hook.results[0].object.must_equal(subject)
-        hook.results[0].channel.must_be_kind_of(Net::SSH::Connection::Channel)
-        hook.results[0].stdout.must_be_nil
-        hook.results[0].stderr.must_equal("test me\n")
+        hook.results.must_equal([ExecutaDataHook.new(subject, nil, "test me\n")])
       end
     end
 
@@ -186,7 +178,7 @@ describe Remote::Exec::Ssh do
         stdout.must_equal("some text")
         stderr.must_be_nil
       end
-      hook.results.must_equal([ExecutaDataHook.new(subject, :channel, "some text", nil)])
+      hook.results.must_equal([ExecutaDataHook.new(subject, "some text", nil)])
     end
 
     it "handles stderr" do
@@ -195,7 +187,7 @@ describe Remote::Exec::Ssh do
         stdout.must_be_nil
         stderr.must_equal("some text")
       end
-      hook.results.must_equal([ExecutaDataHook.new(subject, :channel, nil, "some text")])
+      hook.results.must_equal([ExecutaDataHook.new(subject, nil, "some text")])
     end
 
     it "does not handle extended data other then stderr" do

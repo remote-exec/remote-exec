@@ -30,7 +30,7 @@ class Remote::Exec::Ssh < Remote::Exec::Base
 
   def shutdown
     return if @ssh.nil?
-    before_shutdown.changed_and_notify(self, ssh)
+    before_shutdown.changed_and_notify(self)
     ssh.shutdown!
   ensure
     @ssh = nil
@@ -52,11 +52,11 @@ class Remote::Exec::Ssh < Remote::Exec::Base
   end
 
   def execute_open_channel(channel)
-    before_execute.changed_and_notify(self, channel, @command)
+    before_execute.changed_and_notify(self, @command)
     channel.request_pty
     channel.exec(@command, &method(:execute_channel_exec))
     channel.wait
-    after_execute.changed_and_notify(self, channel, @last_status)
+    after_execute.changed_and_notify(self, @command, @last_status)
   end
 
   def execute_channel_exec(channel, success)
@@ -68,14 +68,14 @@ class Remote::Exec::Ssh < Remote::Exec::Base
   end
 
   def execute_on_stdout(channel, data)
-    on_execute_data.changed_and_notify(self, channel, data, nil)
+    on_execute_data.changed_and_notify(self, data, nil)
     yield(data, nil) if block_given?
   end
 
   def execute_on_stderr(channel, type, data)
     case type
     when 1
-      on_execute_data.changed_and_notify(self, channel, nil, data)
+      on_execute_data.changed_and_notify(self, nil, data)
       yield(nil, data) if block_given?
     else
       raise "Unsupported SSH extended_data type: #{type.inspect}"
@@ -109,7 +109,7 @@ class Remote::Exec::Ssh < Remote::Exec::Base
       handle_exception_retry(exception)
       retry
     end
-    after_connect.changed_and_notify(self, ssh)
+    after_connect.changed_and_notify(self)
     ssh
   end
 
