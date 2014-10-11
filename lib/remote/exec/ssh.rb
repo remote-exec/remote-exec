@@ -96,24 +96,28 @@ class Remote::Exec::Ssh < Remote::Exec::Base
   # @return [Net::SSH::Connection::Session] the SSH connection session
   # @api private
   def establish_connection
-    retries = options[:ssh_retries] || 3
+    @retries = options[:ssh_retries] || 3
     begin
       before_connect.changed_and_notify(self)
       ssh = Net::SSH.start(hostname, username, options)
-    rescue *RESCUE_EXCEPTIONS => e
-      retries -= 1
-      if retries > 0
-        on_connect_retry.changed_and_notify(self, e, retries)
-        sleep options[:ssh_timeout] || 1
-        retry
-      else
-        on_connect_fail.changed_and_notify(self, e)
-        # TODO: should we wrap the error in some other common class?
-        raise e
-      end
+    rescue *RESCUE_EXCEPTIONS => exception
+      handle_exception_retry(exception)
+      retry
     end
     after_connect.changed_and_notify(self, ssh)
     ssh
+  end
+
+  def handle_exception_retry(exception)
+    @retries -= 1
+    if @retries > 0
+      on_connect_retry.changed_and_notify(self, exception, @retries)
+      sleep options[:ssh_timeout] || 1
+    else
+      on_connect_fail.changed_and_notify(self, exception)
+      # TODO: should we wrap the error in some other common class?
+      raise exception
+    end
   end
 
 end
