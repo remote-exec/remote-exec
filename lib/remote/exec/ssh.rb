@@ -96,7 +96,7 @@ class Remote::Exec::Ssh < Remote::Exec::Base
   # @return [Net::SSH::Connection::Session] the SSH connection session
   # @api private
   def establish_connection
-    @retries = options[:ssh_retries] || 3
+    @retries = options[:ssh_retries] || 2
     begin
       before_connect.changed_and_notify(self)
       ssh = Net::SSH.start(hostname, username, options)
@@ -109,8 +109,8 @@ class Remote::Exec::Ssh < Remote::Exec::Base
   end
 
   def handle_exception_retry(exception)
-    @retries -= 1
     if @retries > 0
+      @retries -= 1
       on_connect_retry.changed_and_notify(self, exception, @retries)
       sleep options[:ssh_timeout] || 1
     else

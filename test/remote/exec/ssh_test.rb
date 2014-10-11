@@ -154,14 +154,14 @@ describe Remote::Exec::Ssh do
   end #execute
 
   describe "#establish_connection" do
-    it "does connection" do
+    it "does connect" do
       Net::SSH.unstub(:start)
       Net::SSH.stubs(:start).returns(connection)
       subject.establish_connection.must_equal(connection)
     end
   end
 
-  describe "establishing a connection" do
+  describe "exception in establishing connection" do
 
     [
       Errno::EACCES, Errno::EADDRINUSE, Errno::ECONNREFUSED,
@@ -175,29 +175,26 @@ describe Remote::Exec::Ssh do
           Net::SSH.unstub(:start)
           Net::SSH.stubs(:start).raises(klass)
           subject.instance_variable_set(:@ssh, nil)
-          subject.on_connect_retry.add_observer(@error_counter, :on_connect_retry)
-          subject.on_connect_fail.add_observer(@error_counter, :on_connect_fail)
-          subject.options[:ssh_retries] = 3
-          subject.stubs(:sleep)
+          subject.options[:ssh_retries] = 2
         end
 
         it "reraises the #{klass} exception" do
+          subject.stubs(:sleep)
           proc { subject.establish_connection }.must_raise klass
-          @error_counter.errors.must_equal({:on_connect_retry=>2, :on_connect_fail=>1})
-        end
-
-        it "attempts to connect ':ssh_retries' times" do
-          begin
-            subject.establish_connection
-          rescue
-          end
-          @error_counter.errors.must_equal({:on_connect_retry=>2, :on_connect_fail=>1})
         end
 
         it "sleeps for 1 second between retries" do
-          subject.unstub(:sleep)
           subject.expects(:sleep).with(1).twice
+          begin
+            subject.establish_connection
+          rescue
+          end
+        end
 
+        it "calls hooks on retry/fail ':ssh_retries' times" do
+          subject.stubs(:sleep)
+          subject.on_connect_retry.add_observer(@error_counter, :on_connect_retry)
+          subject.on_connect_fail.add_observer(@error_counter, :on_connect_fail)
           begin
             subject.establish_connection
           rescue
@@ -205,25 +202,23 @@ describe Remote::Exec::Ssh do
           @error_counter.errors.must_equal({:on_connect_retry=>2, :on_connect_fail=>1})
         end
 
-        it "logs the first 2 retry failures on info" do
-          begin
-            subject.establish_connection
-          rescue
-          end
-          @error_counter.errors.must_equal({:on_connect_retry=>2, :on_connect_fail=>1})
-        end
-
-        it "logs the last retry failures on warn" do
-          begin
-            subject.establish_connection
-          rescue
-          end
-          @error_counter.errors.must_equal({:on_connect_retry=>2, :on_connect_fail=>1})
-
-        end
       end
     end
 
-  end #"establishing a connection"
+  end #"exception in establishing connection"
+
+  describe "#handle_exception_retry" do
+    it "does decrease reties count" do
+      subject.instance_variable_set(:@retries, 2)
+      subject.handle_exception_retry("exception_test")
+      subject.instance_variable_get(:@retries).must_equal(1)
+      subject.handle_exception_retry("exception_test")
+      subject.instance_variable_get(:@retries).must_equal(0)
+      lambda {
+        subject.handle_exception_retry("exception_test")
+      }.must_raise(RuntimeError, "exception_test")
+      subject.instance_variable_get(:@retries).must_equal(0)
+    end
+  end
 
 end
