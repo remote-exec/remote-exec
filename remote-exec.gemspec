@@ -18,6 +18,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency('ruby-hooks', '~>1.1')
   spec.add_dependency('session')
   spec.add_dependency('net-ssh')
+  spec.add_development_dependency('guard-minitest')
+  spec.add_development_dependency('guard-yard')
   spec.add_development_dependency('rake')
   spec.add_development_dependency("minitest")
   spec.add_development_dependency("mocha")
