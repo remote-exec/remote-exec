@@ -36,40 +36,42 @@ class Remote::Exec::Ssh < Remote::Exec::Base
   ##
   # Execute command on remote host
   #
-  # @param cmd [String]  command string to execute
-  # @return    [Integer] exit status of the command
+  # @param command [String]  command string to execute
+  # @return        [Integer] exit status of the command
 
   # TODO: make it run in one session
   def execute(command)
-    last_status = nil
-    ssh.open_channel do |channel|
-
-      channel.request_pty
-      before_execute.changed_and_notify(self, channel, command)
-
-      channel.exec(command) do |ch, success|
-
-        channel.on_data do |ch, data|
-          on_execute_data.changed_and_notify(self, channel, data, nil)
-          yield(data, nil) if block_given?
-        end
-
-        channel.on_extended_data do |ch, type, data|
-          on_execute_data.changed_and_notify(self, channel, nil, data)
-          yield(nil, data) if block_given?
-        end
-
-        channel.on_request("exit-status") do |ch, data|
-          last_status = data.read_long
-        end
-
-      end
-
-      channel.wait
-      after_execute.changed_and_notify(self, channel, last_status)
-    end
+    @last_status = nil
+    @command     = command
+    ssh.open_channel(&method(:execute_open_channel))
     ssh.loop
-    last_status
+    @last_status
+  end
+
+  def execute_open_channel(channel)
+    before_execute.changed_and_notify(self, channel, @command)
+    channel.request_pty
+    channel.exec(@command, &method(:execute_channel_exec))
+    channel.wait
+    after_execute.changed_and_notify(self, channel, @last_status)
+  end
+
+  def execute_channel_exec(channel, success)
+    channel.on_data(&method(:execute_on_stdout))
+    channel.on_extended_data(&method(:execute_on_stderr))
+    channel.on_request("exit-status") do |channel, data|
+      @last_status = data.read_long
+    end
+  end
+
+  def execute_on_stdout(channel, data)
+    on_execute_data.changed_and_notify(self, channel, data, nil)
+    yield(data, nil) if block_given?
+  end
+
+  def execute_on_stderr(channel, type, data)
+    on_execute_data.changed_and_notify(self, channel, nil, data)
+    yield(nil, data) if block_given?
   end
 
   def ssh
@@ -103,6 +105,7 @@ class Remote::Exec::Ssh < Remote::Exec::Base
         retry
       else
         on_connect_fail.changed_and_notify(self, e)
+        # TODO: should we wrap the error in some other common class?
         raise e
       end
     end
