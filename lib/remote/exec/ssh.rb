@@ -103,7 +103,7 @@ class Remote::Exec::Ssh < Remote::Exec::Base
     rescue *RESCUE_EXCEPTIONS => e
       retries -= 1
       if retries > 0
-        on_connect_retry.changed_and_notify(self, e)
+        on_connect_retry.changed_and_notify(self, e, retries)
         sleep options[:ssh_timeout] || 1
         retry
       else
