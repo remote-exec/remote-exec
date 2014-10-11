@@ -73,8 +73,13 @@ class Remote::Exec::Ssh < Remote::Exec::Base
   end
 
   def execute_on_stderr(channel, type, data)
-    on_execute_data.changed_and_notify(self, channel, nil, data)
-    yield(nil, data) if block_given?
+    case type
+    when 1
+      on_execute_data.changed_and_notify(self, channel, nil, data)
+      yield(nil, data) if block_given?
+    else
+      raise "Unsupported SSH extended_data type: #{type.inspect}"
+    end
   end
 
   def ssh

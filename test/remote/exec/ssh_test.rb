@@ -54,6 +54,17 @@ class ErrorCounter
   end
 end
 
+class ExecutaDataHook < Struct.new(:object, :channel, :stdout, :stderr)
+  attr_reader :results
+  def initialize(*args)
+    @results = []
+    super
+  end
+  def update(*args)
+    @results << self.class.new(*args)
+  end
+end
+
 describe Remote::Exec::Ssh do
   include Net::SSH::Test
 
@@ -82,6 +93,7 @@ describe Remote::Exec::Ssh do
   end #initialize
 
   describe "#execute" do
+    let(:hook) { ExecutaDataHook.new }
 
     it "executes true" do
       story do |session|
@@ -125,10 +137,16 @@ describe Remote::Exec::Ssh do
       end
 
       assert_scripted do
+        subject.on_execute_data.add_observer(hook, :update)
         subject.execute("echo test me") do |out, err|
           out.must_equal "test me\n"
           err.must_be_nil
         end.must_equal 0
+        hook.results.size.must_equal(1)
+        hook.results[0].object.must_equal(subject)
+        hook.results[0].channel.must_be_kind_of(Net::SSH::Connection::Channel)
+        hook.results[0].stdout.must_equal("test me\n")
+        hook.results[0].stderr.must_be_nil
       end
     end
 
@@ -144,14 +162,51 @@ describe Remote::Exec::Ssh do
       end
 
       assert_scripted do
+        subject.on_execute_data.add_observer(hook, :update)
         subject.execute("echo test me>&2") do |out, err|
           out.must_be_nil
           err.must_equal "test me\n"
         end.must_equal 0
+        hook.results.size.must_equal(1)
+        hook.results[0].object.must_equal(subject)
+        hook.results[0].channel.must_be_kind_of(Net::SSH::Connection::Channel)
+        hook.results[0].stdout.must_be_nil
+        hook.results[0].stderr.must_equal("test me\n")
       end
     end
 
   end #execute
+
+  describe "#execute methods" do
+    let(:hook) { ExecutaDataHook.new }
+
+    it "handles stdout" do
+      subject.on_execute_data.add_observer(hook, :update)
+      subject.execute_on_stdout(:channel, "some text") do |stdout, stderr|
+        stdout.must_equal("some text")
+        stderr.must_be_nil
+      end
+      hook.results.must_equal([ExecutaDataHook.new(subject, :channel, "some text", nil)])
+    end
+
+    it "handles stderr" do
+      subject.on_execute_data.add_observer(hook, :update)
+      subject.execute_on_stderr(:channel, 1, "some text") do |stdout, stderr|
+        stdout.must_be_nil
+        stderr.must_equal("some text")
+      end
+      hook.results.must_equal([ExecutaDataHook.new(subject, :channel, nil, "some text")])
+    end
+
+    it "does not handle extended data other then stderr" do
+      subject.on_execute_data.add_observer(hook, :update)
+      lambda {
+        subject.execute_on_stderr(:channel, 666, "some text")
+      }.must_raise(RuntimeError, "Unsupported SSH extended_data type: 666")
+      hook.results.must_be_empty
+    end
+
+  end #execute methods
 
   describe "#establish_connection" do
     it "does connect" do
