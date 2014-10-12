@@ -11,10 +11,20 @@ require 'net/ssh'
 require 'ruby/hooks'
 require "remote/exec/base"
 
+# Class to help establish SSH connections, issue remote commands, and
+# transfer files between a local system and remote node.
 class Remote::Exec::Ssh < Remote::Exec::Base
   attr_reader :hostname, :username
   attr_accessor :options
 
+  # Constructs a new SSH object.
+  #
+  # @param hostname [String] the remote hostname (IP address, FQDN, etc.)
+  # @param username [String] the username for the remote host
+  # @param options  [Hash]   configuration options for ssh
+  # @yield          [self]   if a block is given then the constructed
+  # object yields itself and calls `#shutdown` at the end, closing the
+  # remote connection
   def initialize(hostname, username, options = {})
     @hostname = hostname
     @username = username
@@ -22,6 +32,7 @@ class Remote::Exec::Ssh < Remote::Exec::Base
     super()
   end
 
+  # Shuts down the session connection, if it is still active.
   def shutdown
     super
     return if @ssh.nil?
@@ -44,6 +55,8 @@ class Remote::Exec::Ssh < Remote::Exec::Base
     ssh.loop
     @last_status
   end
+
+private
 
   def execute_open_channel(channel)
     before_execute.changed_and_notify(self, @command)

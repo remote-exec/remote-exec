@@ -174,7 +174,7 @@ describe Remote::Exec::Ssh do
 
     it "handles stdout" do
       subject.on_execute_data.add_observer(hook, :update)
-      subject.execute_on_stdout(:channel, "some text") do |stdout, stderr|
+      subject.send(:execute_on_stdout, :channel, "some text") do |stdout, stderr|
         stdout.must_equal("some text")
         stderr.must_be_nil
       end
@@ -183,7 +183,7 @@ describe Remote::Exec::Ssh do
 
     it "handles stderr" do
       subject.on_execute_data.add_observer(hook, :update)
-      subject.execute_on_stderr(:channel, 1, "some text") do |stdout, stderr|
+      subject.send(:execute_on_stderr, :channel, 1, "some text") do |stdout, stderr|
         stdout.must_be_nil
         stderr.must_equal("some text")
       end
@@ -193,7 +193,7 @@ describe Remote::Exec::Ssh do
     it "does not handle extended data other then stderr" do
       subject.on_execute_data.add_observer(hook, :update)
       lambda {
-        subject.execute_on_stderr(:channel, 666, "some text")
+        subject.send(:execute_on_stderr, :channel, 666, "some text")
       }.must_raise(RuntimeError, "Unsupported SSH extended_data type: 666")
       hook.results.must_be_empty
     end
@@ -204,7 +204,7 @@ describe Remote::Exec::Ssh do
     it "does connect" do
       Net::SSH.unstub(:start)
       Net::SSH.stubs(:start).returns(connection)
-      subject.establish_connection.must_equal(connection)
+      subject.send(:establish_connection).must_equal(connection)
     end
   end
 
@@ -227,13 +227,13 @@ describe Remote::Exec::Ssh do
 
         it "reraises the #{klass} exception" do
           subject.stubs(:sleep)
-          proc { subject.establish_connection }.must_raise klass
+          proc { subject.send(:establish_connection) }.must_raise klass
         end
 
         it "sleeps for 1 second between retries" do
           subject.expects(:sleep).with(1).twice
           begin
-            subject.establish_connection
+            subject.send(:establish_connection)
           rescue
           end
         end
@@ -243,7 +243,7 @@ describe Remote::Exec::Ssh do
           subject.on_connect_retry.add_observer(@error_counter, :on_connect_retry)
           subject.on_connect_fail.add_observer(@error_counter, :on_connect_fail)
           begin
-            subject.establish_connection
+            subject.send(:establish_connection)
           rescue
           end
           @error_counter.errors.must_equal({:on_connect_retry=>2, :on_connect_fail=>1})
@@ -257,12 +257,12 @@ describe Remote::Exec::Ssh do
   describe "#handle_exception_retry" do
     it "does decrease reties count" do
       subject.instance_variable_set(:@retries, 2)
-      subject.handle_exception_retry("exception_test")
+      subject.send(:handle_exception_retry, "exception_test")
       subject.instance_variable_get(:@retries).must_equal(1)
-      subject.handle_exception_retry("exception_test")
+      subject.send(:handle_exception_retry, "exception_test")
       subject.instance_variable_get(:@retries).must_equal(0)
       lambda {
-        subject.handle_exception_retry("exception_test")
+        subject.send(:handle_exception_retry, "exception_test")
       }.must_raise(RuntimeError, "exception_test")
       subject.instance_variable_get(:@retries).must_equal(0)
     end
