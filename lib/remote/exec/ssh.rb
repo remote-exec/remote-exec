@@ -47,8 +47,8 @@ class Remote::Exec::Ssh < Remote::Exec::Base
   # @param command [String]  command string to execute
   # @return        [Integer] exit status of the command
 
-  # TODO: make it run in one session
   def execute(command)
+    # TODO: make it run in one session
     @last_status = nil
     @command     = command
     ssh.open_channel(&method(:execute_open_channel))
