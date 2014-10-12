@@ -19,18 +19,12 @@ class Remote::Exec::Ssh < Remote::Exec::Base
     @hostname = hostname
     @username = username
     @options = options
-    if block_given?
-      begin
-        yield self
-      ensure
-        shutdown
-      end
-    end
+    super()
   end
 
   def shutdown
+    super
     return if @ssh.nil?
-    before_shutdown.changed_and_notify(self)
     ssh.shutdown!
   ensure
     @ssh = nil

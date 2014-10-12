@@ -7,6 +7,7 @@ See the file LICENSE for copying permission.
 require 'ruby/hooks'
 require "remote/exec/version"
 
+# Define minimal interface for execution handlers
 class Remote::Exec::Base
   extend Ruby::Hooks::InstanceHooks
 
@@ -49,4 +50,21 @@ class Remote::Exec::Base
   # @param command [String]  the executed command
   # @param result  [Integer] the executed command status code (0 - ok, >0 - fail)
   define_hook :after_execute
+
+  # standard in place handler that ensures shutdown is called
+  def initialize
+    if block_given?
+      begin
+        yield self
+      ensure
+        shutdown
+      end
+    end
+  end
+
+  # minimal handler for shutdown
+  def shutdown
+    before_shutdown.changed_and_notify(self)
+  end
+
 end

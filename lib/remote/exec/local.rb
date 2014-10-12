@@ -6,7 +6,7 @@ class Remote::Exec::Local < Remote::Exec::Base
 
   def initialize(shell = "sh")
     @shell = shell
-    yield self if block_given?
+    super()
   end
 
   def execute(command)
