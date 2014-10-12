@@ -8,7 +8,6 @@ License: https://github.com/test-kitchen/test-kitchen/blob/459238b88c/LICENSE
 =end
 
 require 'net/ssh'
-require 'ruby/hooks'
 require "remote-exec/base"
 
 # Class to help establish SSH connections, issue remote commands, and

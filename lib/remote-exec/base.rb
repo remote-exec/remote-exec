@@ -4,12 +4,12 @@ Copyright 2014 Michal Papis <mpapis@gmail.com>
 See the file LICENSE for copying permission.
 =end
 
-require 'ruby/hooks'
+require 'ruby-hooks'
 require "remote-exec/version"
 
 # Define minimal interface for execution handlers
 class RemoteExec::Base
-  extend Ruby::Hooks::InstanceHooks
+  extend RubyHooks::InstanceHooks
 
   # called before connection attempt will be made, used when connection may fail
   # @notify_param object [Object] the target that invoked the method
