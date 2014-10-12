@@ -16,9 +16,9 @@ class RemoteExec::Fake < RemoteExec::Base
 
   # Constructs a new Fake object.
   #
-  # @yield       [self]   if a block is given then the constructed
-  # object yields itself and calls `#shutdown` at the end, closing the
-  # remote connection
+  # @yield [self] if a block is given then the constructed  object
+  #               yields itself and calls `#shutdown` at the end,
+  #               closing the remote connection
 
   def initialize
     after_connect.changed_and_notify(self)

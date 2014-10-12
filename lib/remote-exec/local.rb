@@ -10,8 +10,8 @@ class RemoteExec::Local < RemoteExec::Base
   #
   # @param shell [String] name of the shell to run
   # @yield       [self]   if a block is given then the constructed
-  # object yields itself and calls `#shutdown` at the end, closing the
-  # remote connection
+  #                       object yields itself and calls `#shutdown`
+  #                       at the end, closing the remote connection
 
   def initialize(shell = "sh")
     @shell = shell

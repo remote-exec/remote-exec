@@ -27,8 +27,8 @@ class RemoteExec::Ssh < RemoteExec::Base
   # @param username [String] the username for the remote host
   # @param options  [Hash]   configuration options for ssh
   # @yield          [self]   if a block is given then the constructed
-  # object yields itself and calls `#shutdown` at the end, closing the
-  # remote connection
+  #                          object yields itself and calls `#shutdown`
+  #                          at the end, closing the remote connection
   def initialize(hostname, username, options = {})
     @hostname = hostname
     @username = username
