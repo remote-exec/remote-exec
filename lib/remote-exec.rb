@@ -1,4 +1,4 @@
-require "remote_exec/version"
-require "remote_exec/fake"
-require "remote_exec/local"
-require "remote_exec/ssh"
+require "remote-exec/version"
+require "remote-exec/fake"
+require "remote-exec/local"
+require "remote-exec/ssh"

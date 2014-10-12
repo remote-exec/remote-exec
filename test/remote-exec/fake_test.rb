@@ -1,5 +1,5 @@
 require 'test_helper'
-require 'remote_exec/fake'
+require 'remote-exec/fake'
 
 describe RemoteExec::Fake do
   subject do

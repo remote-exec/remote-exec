@@ -9,7 +9,7 @@ License: https://github.com/test-kitchen/test-kitchen/blob/459238b88c/LICENSE
 
 require 'net/ssh'
 require 'ruby/hooks'
-require "remote_exec/base"
+require "remote-exec/base"
 
 # Class to help establish SSH connections, issue remote commands, and
 # transfer files between a local system and remote node.

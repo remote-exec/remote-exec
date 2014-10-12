@@ -7,7 +7,7 @@ See the file LICENSE for copying permission.
 lib = File.expand_path('../lib/', __FILE__)
 $:.unshift lib unless $:.include?(lib)
 
-require 'remote_exec/version'
+require 'remote-exec/version'
 
 Gem::Specification.new do |spec|
   spec.name        = 'remote-exec'

@@ -8,7 +8,7 @@ License: https://github.com/test-kitchen/test-kitchen/blob/459238b88c/LICENSE
 =end
 
 require 'test_helper'
-require 'remote_exec/ssh'
+require 'remote-exec/ssh'
 require 'net/ssh/test'
 
 module Net

@@ -5,7 +5,7 @@ See the file LICENSE for copying permission.
 =end
 
 require 'ruby/hooks'
-require "remote_exec/version"
+require "remote-exec/version"
 
 # Define minimal interface for execution handlers
 class RemoteExec::Base

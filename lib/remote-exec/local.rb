@@ -1,5 +1,5 @@
 require 'session'
-require "remote_exec/base"
+require "remote-exec/base"
 
 # Class to run local commands and transfer files localy.
 class RemoteExec::Local < RemoteExec::Base
