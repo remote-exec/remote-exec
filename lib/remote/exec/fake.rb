@@ -9,7 +9,7 @@ class Remote::Exec::Fake < Remote::Exec::Base
 
   def execute(command)
     before_execute.changed_and_notify(self, command)
-    last_status, outputs = @respond.call(command)
+    last_status, outputs = @story.call(command)
     outputs.each do |out, err|
       on_execute_data.changed_and_notify(self, out, err)
       yield(out, err) if block_given?
@@ -18,8 +18,8 @@ class Remote::Exec::Fake < Remote::Exec::Base
     last_status
   end
 
-  def respond(&block)
-    @respond = block
+  def story(&block)
+    @story = block
   end
 
 end

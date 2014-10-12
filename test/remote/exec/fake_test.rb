@@ -8,7 +8,7 @@ describe Remote::Exec::Fake do
 
   it "runs true" do
     test_command = "true"
-    subject.respond do |command|
+    subject.story do |command|
       command.must_equal test_command
       [0,[]]
     end
@@ -23,7 +23,7 @@ describe Remote::Exec::Fake do
 
   it "runs false" do
     test_command = "false"
-    subject.respond do |command|
+    subject.story do |command|
       command.must_equal test_command
       [1,[]]
     end
@@ -38,7 +38,7 @@ describe Remote::Exec::Fake do
 
   it "runs echo test" do
     test_command = "echo test"
-    subject.respond do |command|
+    subject.story do |command|
       command.must_equal test_command
       [0,[["test\n",nil]]]
     end
