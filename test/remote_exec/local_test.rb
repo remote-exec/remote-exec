@@ -1,9 +1,9 @@
 require 'test_helper'
-require 'remote/exec/local'
+require 'remote_exec/local'
 
-describe Remote::Exec::Local do
+describe RemoteExec::Local do
   subject do
-    Remote::Exec::Local.new
+    RemoteExec::Local.new
   end
 
   it "runs true" do

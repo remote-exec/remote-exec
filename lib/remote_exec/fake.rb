@@ -1,7 +1,7 @@
-require "remote/exec/base"
+require "remote_exec/base"
 
 # Class to fake running commands and transfering files.
-class Remote::Exec::Fake < Remote::Exec::Base
+class RemoteExec::Fake < RemoteExec::Base
 
   ##
   # The story to tell in +execute+, take an array

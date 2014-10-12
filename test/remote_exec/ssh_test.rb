@@ -8,7 +8,7 @@ License: https://github.com/test-kitchen/test-kitchen/blob/459238b88c/LICENSE
 =end
 
 require 'test_helper'
-require 'remote/exec/ssh'
+require 'remote_exec/ssh'
 require 'net/ssh/test'
 
 module Net
@@ -65,11 +65,11 @@ class ExecutaDataHook < Struct.new(:object, :stdout, :stderr)
   end
 end
 
-describe Remote::Exec::Ssh do
+describe RemoteExec::Ssh do
   include Net::SSH::Test
 
   subject do
-    Remote::Exec::Ssh.allocate.tap do |ssh|
+    RemoteExec::Ssh.allocate.tap do |ssh|
       ssh.instance_variable_set(:@ssh, connection)
       ssh.instance_variable_set(:@options, {})
     end

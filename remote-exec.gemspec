@@ -7,11 +7,11 @@ See the file LICENSE for copying permission.
 lib = File.expand_path('../lib/', __FILE__)
 $:.unshift lib unless $:.include?(lib)
 
-require 'remote/exec/version'
+require 'remote_exec/version'
 
 Gem::Specification.new do |spec|
   spec.name        = 'remote-exec'
-  spec.version     = ::Remote::Exec::VERSION
+  spec.version     = ::RemoteExec::VERSION
   spec.licenses    = ['MIT']
 
   spec.authors     = ['Michal Papis']

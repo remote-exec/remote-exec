@@ -1,8 +1,8 @@
 require 'session'
-require "remote/exec/base"
+require "remote_exec/base"
 
 # Class to run local commands and transfer files localy.
-class Remote::Exec::Local < Remote::Exec::Base
+class RemoteExec::Local < RemoteExec::Base
   # name of the shell to run
   attr_reader :shell
 

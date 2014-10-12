@@ -1,9 +1,9 @@
 require 'test_helper'
-require 'remote/exec/fake'
+require 'remote_exec/fake'
 
-describe Remote::Exec::Fake do
+describe RemoteExec::Fake do
   subject do
-    Remote::Exec::Fake.new
+    RemoteExec::Fake.new
   end
 
   it "runs true" do

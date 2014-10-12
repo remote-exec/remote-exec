@@ -5,10 +5,10 @@ See the file LICENSE for copying permission.
 =end
 
 require 'ruby/hooks'
-require "remote/exec/version"
+require "remote_exec/version"
 
 # Define minimal interface for execution handlers
-class Remote::Exec::Base
+class RemoteExec::Base
   extend Ruby::Hooks::InstanceHooks
 
   # called before connection attempt will be made, used when connection may fail
