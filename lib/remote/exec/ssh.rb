@@ -14,10 +14,14 @@ require "remote/exec/base"
 # Class to help establish SSH connections, issue remote commands, and
 # transfer files between a local system and remote node.
 class Remote::Exec::Ssh < Remote::Exec::Base
-  attr_reader :hostname, :username
+  # hostname for the connection
+  attr_reader :hostname
+  # username for the connection
+  attr_reader :username
+  # options for the connection
   attr_accessor :options
 
-  # Constructs a new SSH object.
+  # Constructs a new Ssh object.
   #
   # @param hostname [String] the remote hostname (IP address, FQDN, etc.)
   # @param username [String] the username for the remote host

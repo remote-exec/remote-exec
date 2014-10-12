@@ -1,13 +1,28 @@
 require 'session'
 require "remote/exec/base"
 
+# Class to run local commands and transfer files localy.
 class Remote::Exec::Local < Remote::Exec::Base
+  # name of the shell to run
   attr_reader :shell
+
+  # Constructs a new Local object.
+  #
+  # @param shell [String] name of the shell to run
+  # @yield       [self]   if a block is given then the constructed
+  # object yields itself and calls `#shutdown` at the end, closing the
+  # remote connection
 
   def initialize(shell = "sh")
     @shell = shell
     super()
   end
+
+  ##
+  # Execute command locally
+  #
+  # @param command [String]  command string to execute
+  # @return        [Integer] exit status of the command
 
   def execute(command)
     before_execute.changed_and_notify(self, command)
@@ -19,6 +34,8 @@ class Remote::Exec::Local < Remote::Exec::Base
     after_execute.changed_and_notify(self, command, last_status)
     last_status
   end
+
+private
 
   def shell_session
     @shell_session ||= Session::Sh.new(:prog => shell).tap do |shell|
