@@ -10,7 +10,7 @@ class RemoteExec::Fake < RemoteExec::Base
   #
   #   [1, [[nil,"error\n"]]
   #
-  # consist of an array: [ return_status, [[ stdout, stderr],...] ]
+  # @return [Array] story to run in execute, format: [ return_status, [[ stdout, stderr],...] ]
 
   attr_accessor :story
 
