@@ -1,17 +1,25 @@
-require "remote/exec/version"
+require "remote/exec/base"
 
-class Remote::Exec::Fake
-  attr_reader :last_status
+class Remote::Exec::Fake < Remote::Exec::Base
+
+  def initialize
+    after_connect.changed_and_notify(self)
+    super
+  end
 
   def execute(command)
-    @last_status, outputs = @respond.call(command)
+    before_execute.changed_and_notify(self, command)
+    last_status, outputs = @respond.call(command)
     outputs.each do |out, err|
-      yield(out, err)
+      on_execute_data.changed_and_notify(self, out, err)
+      yield(out, err) if block_given?
     end
-    @last_status
+    after_execute.changed_and_notify(self, command, last_status)
+    last_status
   end
 
   def respond(&block)
     @respond = block
   end
+
 end
