@@ -64,7 +64,7 @@ private
 
   def execute_open_channel(channel)
     before_execute.changed_and_notify(self, @command)
-    channel.request_pty
+    channel.request_pty unless options[:ssh_request_pty] == false
     channel.exec(@command, &method(:execute_channel_exec))
     channel.wait
     after_execute.changed_and_notify(self, @command, @last_status)

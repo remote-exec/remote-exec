@@ -98,7 +98,6 @@ describe RemoteExec::Ssh do
     it "executes true" do
       story do |session|
         channel = session.opens_channel
-        channel.sends_request_pty
         channel.sends_exec "true"
         channel.gets_exit_status(0)
         channel.gets_close
@@ -106,6 +105,7 @@ describe RemoteExec::Ssh do
       end
 
       assert_scripted do
+        subject.options[:ssh_request_pty] = false
         subject.execute("true").must_equal 0
       end
     end
