@@ -39,10 +39,10 @@ class RemoteExec::Ssh < RemoteExec::Base
   # Shuts down the session connection, if it is still active.
   def shutdown
     super
-    return if @ssh.nil?
-    ssh.shutdown!
+    return if @session.nil?
+    session.shutdown!
   ensure
-    @ssh = nil
+    @session = nil
   end
 
   ##
@@ -55,8 +55,8 @@ class RemoteExec::Ssh < RemoteExec::Base
     # TODO: make it run in one session
     @last_status = nil
     @command     = command
-    ssh.open_channel(&method(:execute_open_channel))
-    ssh.loop
+    session.open_channel(&method(:execute_open_channel))
+    session.loop
     @last_status
   end
 
@@ -93,8 +93,8 @@ private
     end
   end
 
-  def ssh
-    @ssh ||= establish_connection
+  def session
+    @session ||= establish_connection
   end
 
   RESCUE_EXCEPTIONS = [

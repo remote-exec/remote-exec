@@ -70,7 +70,7 @@ describe RemoteExec::Ssh do
 
   subject do
     RemoteExec::Ssh.allocate.tap do |ssh|
-      ssh.instance_variable_set(:@ssh, connection)
+      ssh.instance_variable_set(:@session, connection)
       ssh.instance_variable_set(:@options, {})
     end
   end
@@ -221,7 +221,6 @@ describe RemoteExec::Ssh do
           @error_counter = ErrorCounter.new
           Net::SSH.unstub(:start)
           Net::SSH.stubs(:start).raises(klass)
-          subject.instance_variable_set(:@ssh, nil)
           subject.options[:ssh_retries] = 2
         end
 
