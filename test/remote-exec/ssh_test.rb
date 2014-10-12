@@ -7,9 +7,9 @@ Partially based on test-kitchen by Fletcher Nichol <fnichol@nichol.ca>
 License: https://github.com/test-kitchen/test-kitchen/blob/459238b88c/LICENSE
 =end
 
-require 'test_helper'
-require 'remote-exec/ssh'
-require 'net/ssh/test'
+require "test_helper"
+require "remote-exec/ssh"
+require "net/ssh/test"
 
 module Net
   module SSH

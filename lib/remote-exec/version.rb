@@ -7,5 +7,5 @@ See the file LICENSE for copying permission.
 # Unified handling of remote execution and file transfer
 module RemoteExec
   # Version of this gem
-  VERSION = '0.6.0'
+  VERSION = "0.6.0"
 end

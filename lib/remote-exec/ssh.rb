@@ -7,7 +7,7 @@ Partially based on test-kitchen by Fletcher Nichol <fnichol@nichol.ca>
 License: https://github.com/test-kitchen/test-kitchen/blob/459238b88c/LICENSE
 =end
 
-require 'net/ssh'
+require "net/ssh"
 require "remote-exec/base"
 
 # Class to help establish SSH connections, issue remote commands, and

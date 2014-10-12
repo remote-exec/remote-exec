@@ -4,7 +4,7 @@ Copyright 2014 Michal Papis <mpapis@gmail.com>
 See the file LICENSE for copying permission.
 =end
 
-require 'session'
+require "session"
 require "remote-exec/base"
 
 # Class to run local commands and transfer files localy.

@@ -1,5 +1,5 @@
-require 'test_helper'
-require 'remote-exec/local'
+require "test_helper"
+require "remote-exec/local"
 
 describe RemoteExec::Local do
   subject do
