@@ -7,5 +7,6 @@
 [![Coverage Status](https://img.shields.io/coveralls/remote-exec/remote-exec.svg)](https://coveralls.io/r/remote-exec/remote-exec?branch=master)
 [![Inline docs](http://inch-ci.org/github/remote-exec/remote-exec.png)](http://inch-ci.org/github/remote-exec/remote-exec)
 [![Yard Docs](http://img.shields.io/badge/yard-docs-blue.svg)](http://rubydoc.info/github/remote-exec/remote-exec/master/frames)
+[![Github Code](http://img.shields.io/badge/github-code-blue.svg)](https://github.com/remote-exec/remote-exec)
 
 Invoke commands on remote hosts
