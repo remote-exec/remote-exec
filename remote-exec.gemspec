@@ -24,6 +24,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency("ruby-hooks", "~>1.2")
   spec.add_dependency("session",    "~>3.2")
 
+
   spec.add_development_dependency("guard",          "~>2.6")
   spec.add_development_dependency("guard-minitest", "~>2.3")
   spec.add_development_dependency("guard-yard",     "~>2.1")
