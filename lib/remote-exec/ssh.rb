@@ -35,6 +35,10 @@ class RemoteExec::Ssh < RemoteExec::Base
     super()
   end
 
+  def to_s
+    "<RemoteExec::Ssh @hostname=#{@hostname.inspect}, @username=#{@username.inspect}>"
+  end
+
   # Shuts down the session connection, if it is still active.
   def shutdown
     super
